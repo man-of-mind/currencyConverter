@@ -15,56 +15,38 @@ function App() {
   const symbols = data.symbols;
   const allRates = Object.entries(data.rate.results);
 
-  const initialState = {
-    fromCurrency: 'USD',
-    toCurrency: 'EUR',
-    amount: 1,
-    result: 0.98,
-    updateFrom: 'USD',
-    updateTo: 'EUR',
-    updateAmount: 1
-  }
-
-  const [states, setState] = React.useState(initialState);
+  
+  const [show, setShow] = React.useState<Boolean>(false);
+  const [fromCurrency, setFromCurrency] = React.useState<string>('');
+  const [toCurrency, setToCurrency] = React.useState<string>('');
+  const [amount, setAmount] = React.useState(1);
+  const [result, setResult] = React.useState(0);
 
   const handleChangeFrom = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...initialState,
-      fromCurrency: event.target.value
-    })
+    setFromCurrency(event.target.value);
+    setShow(false)
   };
 
   const handleChangeTO = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...initialState,
-      toCurrency: event.target.value
-    })
+    setToCurrency(event.target.value)
+    setShow(false)
   };
 
   const handleChangeRate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...initialState,
-      amount: Number(event.target.value)
-    });
+    setAmount(Number(event.target.value));
+    setShow(false)
   };
 
   const convertCurrency = () => {
     const currencyProp = allRates.filter(([symbol, value]) => {
-      return symbol === states.fromCurrency
+      return symbol === fromCurrency
     });
     const currencyRate = currencyProp[0][1];
-    const equivalentUSD = Number(states.amount) / currencyRate ;
-    const toCurrencyProp = allRates.filter(([sym, val]) => sym === states.toCurrency);
+    const equivalentUSD = Number(amount) / currencyRate ;
+    const toCurrencyProp = allRates.filter(([sym, val]) => sym === toCurrency);
     const answer = equivalentUSD * toCurrencyProp[0][1];
-    setState({
-      fromCurrency: states.fromCurrency,
-      toCurrency: states.toCurrency,
-      amount: states.amount,
-      result: Number(answer.toFixed(3)),
-      updateAmount: states.amount,
-      updateTo: states.toCurrency,
-      updateFrom: states.fromCurrency
-    });
+    setResult(Number(answer.toFixed(3)));
+    setShow(true);
   }
   
 
@@ -76,15 +58,17 @@ function App() {
             CURRENCY CONVERTER
           </Typography>
           <Divider/>
-          <Typography align='center' variant='h4' sx={{paddingTop: 3, paddingBottom: 2, fontSize: 22}}>
-            {states.updateAmount} {states.updateFrom} is equivalent to
-          </Typography>
-          <Typography align='center' variant='h4' sx={{fontSize: 26, fontWeight: 700, paddingBottom: '20px'}}>
-            {`${states.result}${states.updateTo}`}
-          </Typography>
-          <Typography align='center' sx={{fontSize: 16, color: 'gray'}}>
-            As of {date}
-          </Typography>
+          <>{show ?
+            (<><Typography align='center' variant='h4' sx={{paddingTop: 3, paddingBottom: 2, fontSize: 22}}>
+              {amount} {fromCurrency} is equivalent to
+            </Typography> 
+            <Typography align='center' variant='h4' sx={{fontSize: 26, fontWeight: 700, paddingBottom: '20px'}}>
+            {`${result}${toCurrency}`}
+            </Typography>
+            <Typography align='center' sx={{fontSize: 16, color: 'gray'}}>
+              As of {date}
+            </Typography></>) 
+          : (null)}</>
         </CardContent>
         <CardContent sx={{display: 'inline'}}>
           <Box>
@@ -93,7 +77,7 @@ function App() {
                 id="standard-number"
                 variant="standard"
                 type="number"
-                value={states.amount}
+                value={amount}
                 onChange={handleChangeRate}
                 InputProps={{
                   readOnly: false
@@ -103,7 +87,7 @@ function App() {
                 id="filled-select-currency-native"
                 select
                 label="Currencies"
-                value={states.fromCurrency}
+                value={fromCurrency}
                 onChange={handleChangeFrom}
                 SelectProps={{
                   native: true,
@@ -121,12 +105,12 @@ function App() {
           </Box>
           <Box sx={{display: 'inline'}} component="div">
             <div className={styles['input-cont']}>
-              <TextField id="filled-basic" label="" variant="filled" value={states.result} sx={{width: 200}}/>
+              <TextField id="filled-basic" label="" variant="filled" value={result} sx={{width: 200}}/>
               <TextField
                 id="filled-select-currency-native"
                 select
                 label="Currencies"
-                value={states.toCurrency}
+                value={toCurrency}
                 onChange={handleChangeTO}
                 SelectProps={{
                   native: true,
