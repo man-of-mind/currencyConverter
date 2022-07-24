@@ -1,0 +1,26 @@
+{
+    "symbols": [
+        "USD",
+        "AUD",
+        "EUR",
+        "GBP",
+        "INR",
+        "CAD",
+        "JPY",
+        "NGN"
+    ],
+    "rate": {
+        "from": "USD",
+        "amount": 1,
+        "results": {
+            "USD": 1,
+            "AUD": 1.4466,
+            "EUR": 0.97956,
+            "GBP": 0.83301,
+            "INR": 79.865,
+            "CAD": 1.2911,
+            "JPY": 136.09,
+            "NGN": 414.72
+        }
+    }
+}

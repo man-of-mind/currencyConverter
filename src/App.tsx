@@ -8,54 +8,65 @@ import styles from './App.module.scss';
 import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import axios from 'axios'
+import data from './currencyRate.json';
 
 function App() {
   const date = new Date().toLocaleDateString();
-  const API_KEY = "z3wFSr5RGhyLzE81nRDW09n90fBDU1Wi";
+  const symbols = data.symbols;
+  const allRates = Object.entries(data.rate.results);
 
-  const instance = axios.create(
-    {
-      baseURL: 'https://api.apilayer.com/exchangerates_data',
-      headers: {'apiKey': API_KEY}
-    });
+  const initialState = {
+    fromCurrency: 'USD',
+    toCurrency: 'EUR',
+    amount: 1,
+    result: 0.98,
+    updateFrom: 'USD',
+    updateTo: 'EUR',
+    updateAmount: 1
+  }
 
-  const [currencies, setCurrencies] = React.useState<Array<string>>(['USD', 'EUR'])
-
-  const [fromCurrency, setCurrencyFrom] = React.useState<string>('USD');
-  const [result, setResult] = React.useState<number>(0);
-  const [amount, setAmount] = React.useState('1');
-  const [toCurrency, setCurrencyTo] = React.useState<string>('EUR');
+  const [states, setState] = React.useState(initialState);
 
   const handleChangeFrom = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrencyFrom(event.target.value);
+    setState({
+      ...initialState,
+      fromCurrency: event.target.value
+    })
   };
 
   const handleChangeTO = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrencyTo(event.target.value);
+    setState({
+      ...initialState,
+      toCurrency: event.target.value
+    })
   };
 
   const handleChangeRate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
+    setState({
+      ...initialState,
+      amount: Number(event.target.value)
+    });
   };
 
   const convertCurrency = () => {
-    console.log('convert');
-    instance.get(`convert?to=${toCurrency}&from=${fromCurrency}&amount=${amount}`).then(res =>
-      console.log(res.data)).catch(err => alert(`Error Occurred detailing: ${err.message}`))
+    const currencyProp = allRates.filter(([symbol, value]) => {
+      return symbol === states.fromCurrency
+    });
+    const currencyRate = currencyProp[0][1];
+    const equivalentUSD = Number(states.amount) / currencyRate ;
+    const toCurrencyProp = allRates.filter(([sym, val]) => sym === states.toCurrency);
+    const answer = equivalentUSD * toCurrencyProp[0][1];
+    setState({
+      fromCurrency: states.fromCurrency,
+      toCurrency: states.toCurrency,
+      amount: states.amount,
+      result: Number(answer.toFixed(3)),
+      updateAmount: states.amount,
+      updateTo: states.toCurrency,
+      updateFrom: states.fromCurrency
+    });
   }
   
- 
-
-  
-
-  
-
-  React.useEffect(() => {
-
-    instance.get('/symbols').then((res) => 
-    setCurrencies(Object.keys(res.data.symbols)));
-  }, [instance])
 
   return (
     <div className={styles["App"]}>
@@ -66,10 +77,10 @@ function App() {
           </Typography>
           <Divider/>
           <Typography align='center' variant='h4' sx={{paddingTop: 3, paddingBottom: 2, fontSize: 22}}>
-            {amount} {fromCurrency} is equivalent to
+            {states.updateAmount} {states.updateFrom} is equivalent to
           </Typography>
           <Typography align='center' variant='h4' sx={{fontSize: 26, fontWeight: 700, paddingBottom: '20px'}}>
-            {`${result}${toCurrency}`}
+            {`${states.result}${states.updateTo}`}
           </Typography>
           <Typography align='center' sx={{fontSize: 16, color: 'gray'}}>
             As of {date}
@@ -82,7 +93,7 @@ function App() {
                 id="standard-number"
                 variant="standard"
                 type="number"
-                value={amount}
+                value={states.amount}
                 onChange={handleChangeRate}
                 InputProps={{
                   readOnly: false
@@ -92,7 +103,7 @@ function App() {
                 id="filled-select-currency-native"
                 select
                 label="Currencies"
-                value={fromCurrency}
+                value={states.fromCurrency}
                 onChange={handleChangeFrom}
                 SelectProps={{
                   native: true,
@@ -100,7 +111,7 @@ function App() {
                 variant="filled"
                 sx={{width: '100px'}}
                 >
-                {currencies.map((curr) => (
+                {symbols.map((curr) => (
                   <option key={curr} value={curr}>
                     {curr}
                   </option>
@@ -110,12 +121,12 @@ function App() {
           </Box>
           <Box sx={{display: 'inline'}} component="div">
             <div className={styles['input-cont']}>
-              <TextField id="filled-basic" label="" variant="filled" value={result} sx={{width: 200}}/>
+              <TextField id="filled-basic" label="" variant="filled" value={states.result} sx={{width: 200}}/>
               <TextField
                 id="filled-select-currency-native"
                 select
                 label="Currencies"
-                value={toCurrency}
+                value={states.toCurrency}
                 onChange={handleChangeTO}
                 SelectProps={{
                   native: true,
@@ -123,7 +134,7 @@ function App() {
                 variant="filled"
                 sx={{width: '100px'}}
                 >
-                {currencies.map((curr) => (
+                {symbols.map((curr) => (
                   <option key={curr} value={curr}>
                     {curr}
                   </option>
