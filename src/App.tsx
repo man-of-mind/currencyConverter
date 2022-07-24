@@ -17,8 +17,8 @@ function App() {
 
   
   const [show, setShow] = React.useState<Boolean>(false);
-  const [fromCurrency, setFromCurrency] = React.useState<string>('');
-  const [toCurrency, setToCurrency] = React.useState<string>('');
+  const [fromCurrency, setFromCurrency] = React.useState<string>('USD');
+  const [toCurrency, setToCurrency] = React.useState<string>('USD');
   const [amount, setAmount] = React.useState(1);
   const [result, setResult] = React.useState(0);
 
