@@ -1,0 +1,23 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+}
+
+.App {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    padding-top: 50px;
+    .input-cont {
+        display: flex;
+        justify-content: space-evenly;
+        .text {
+            margin-bottom: 25px;
+            padding-top: 3px;
+            width: 200px;
+        }
+    }
+}
